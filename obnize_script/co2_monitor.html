@@ -1,0 +1,95 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://obniz.io/js/jquery-3.2.1.min.js"></script>
+    <script src="https://unpkg.com/obniz@1.13.1/obniz.js" crossorigin="anonymous"></script>
+    <style type="text/css">
+        button {
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="obniz-debug"></div>
+<h1>CO2 sensor reader</h1>
+<button id="read">read</button>
+<div id="print"></div>
+
+<script>
+    var obniz = new Obniz("4920-7632");
+    obniz.onconnect = async function () {
+        var power = obniz.wired("USB", {gnd: 3, vcc: 2});
+        var led = obniz.wired("LED", {anode: 10, cathode: 11})
+        var co2history = [];
+        power.on();
+        led.on();
+        await obniz.wait(3000);
+        led.off();
+
+        var uart0 = obniz.getFreeUart();
+        console.log(obniz.uart0);
+        obniz.uart0.start({tx: 0, rx: 1, baud: 9600});
+
+        obniz.uart0.onreceive = function (data, text) {
+            console.log(data);
+            window.xx = data;
+
+            if (data[0] == 0xff && data[1] == 0x86) {
+                var level = data[2] * 100 + data[3];
+                co2history.push(level);
+                if (co2history.length > 100) {
+                    co2history.splice(0, 1);
+                }
+                console.log(level.toString() + 'ppm');
+
+                if (level > 1500) {
+                    high_alert(level / 100);
+                }
+
+                obniz.display.drawing(false);
+                obniz.display.clear();
+
+                // obnize display resolution is 128*64
+                var x0 = 0;
+                var y0 = 64 - co2history[0] / 40;
+                for (var i = 0; i < co2history.length; i++) {
+                    var val = 64 - co2history[i] / 40;
+                    obniz.display.line(x0, y0, i, val);
+                    x0 = i;
+                    y0 = val;
+                }
+                obniz.display.line(0, 64 - 25, 128, 64 - 25);
+                obniz.display.line(0, 64 - 50, 128, 64 - 50);
+
+                obniz.display.font('Avenir', 10)
+                obniz.display.pos(0, 64 - 25);
+                obniz.display.print("1000ppm");
+
+                obniz.display.pos(0, 64 - 50);
+                obniz.display.print("2000ppm");
+
+                obniz.display.drawing(true);
+            }
+        }
+
+        $('#read').click(function () {
+            obniz.uart0.send([0xff, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79]);
+        });
+
+        var high_alert = async function (n) {
+            for (var i = 0; i < n; i++) {
+                led.on();
+                await obniz.wait(300);
+                led.off();
+                await obniz.wait(300);
+            }
+        }
+
+    }
+
+</script>
+</body>
+</html>
