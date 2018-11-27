@@ -10,18 +10,21 @@ TBD ###  at this point, browser required to run obniz.  Later server will run ob
 
 # Obniz
 
+- https://obniz.io/doc/quickstart
+
 # CO2 sensor
 
 - MH-Z19
-- https://www.winsen-sensor.com/products/ndir-co2-sensor/mh-z19b.html
-- command/response unofficial spec : https://revspace.nl/MHZ19#Command_0x86_.28read_concentration.29
-- For serveral 10 seconds after power up, it sends out packets which obniz can safely ignore.
+  - https://www.winsen-sensor.com/products/ndir-co2-sensor/mh-z19b.html
+  - command/response unofficial spec : https://revspace.nl/MHZ19#Command_0x86_.28read_concentration.29
+  - For serveral 10 seconds after power up, it sends out packets which obniz can safely ignore.
 
 # LED
 
-- Vf 1.9-2.4V
-- If 20mA (max 30mA)
-- 200 - 400 orm register shall be serialized
+- RED
+  - Vf 1.9-2.4V
+  - If 20mA (max 30mA)
+  - 200 - 400 orm register shall be serialized
 
 # Wiring
 

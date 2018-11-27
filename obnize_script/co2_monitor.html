@@ -1,5 +1,6 @@
-<html>
+<html lang="ja">
 <head>
+    <title>CO2 level</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://obniz.io/js/jquery-3.2.1.min.js"></script>
@@ -27,15 +28,15 @@
 <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
 <script>
-    var obniz = new Obniz("4920-7632");
-    var onconnect_func = async function () {
-        var power = obniz.wired("USB", {gnd: 3, vcc: 2});
-        var led = obniz.wired("LED", {anode: 10, cathode: 11})
-        var co2history = [];
+    let obniz = new Obniz("4920-7632");
+    let onconnect_func = async function () {
+        let power = obniz.wired("USB", {gnd: 3, vcc: 2});
+        let led = obniz.wired("LED", {anode: 10, cathode: 11});
+        let co2history = [];
         obniz.keepWorkingAtOffline(true);
 
         power.on();
-        var uart0 = obniz.getFreeUart();
+        let uart0 = obniz.getFreeUart();
         obniz.uart0.start({tx: 0, rx: 1, baud: 9600});
 
         led.on();
@@ -43,10 +44,8 @@
         led.off();
 
         obniz.uart0.onreceive = function (data, text) {
-            window.xx = data;
-
             if (data[0] == 0xff && data[1] == 0x86) {
-                var level = data[2] * 100 + data[3];
+                let level = data[2] * 100 + data[3];
                 co2history.push(level);
                 if (co2history.length > 100) {
                     co2history.splice(0, 1);
@@ -63,8 +62,8 @@
                 // obnize display resolution is 128*64
                 var x0 = 0;
                 var y0 = 64 - co2history[0] / 40;
-                for (var i = 0; i < co2history.length; i++) {
-                    var val = 64 - co2history[i] / 40;
+                for (let i = 0; i < co2history.length; i++) {
+                    let val = 64 - co2history[i] / 40;
                     obniz.display.line(x0, y0, i, val);
                     x0 = i;
                     y0 = val;
@@ -72,11 +71,11 @@
                 obniz.display.line(0, 64 - 25, 128, 64 - 25);
                 obniz.display.line(0, 64 - 50, 32, 64 - 50);
 
-                obniz.display.font('Consolas', 20)
+                obniz.display.font('Consolas', 20);
                 obniz.display.pos(40, 2);
                 obniz.display.print(level.toString() + 'ppm');
 
-                obniz.display.font('Avenir', 8)
+                obniz.display.font('Avenir', 8);
                 obniz.display.pos(0, 64 - 25);
                 obniz.display.print("1000");
 
@@ -89,24 +88,24 @@
                     high_alert(level / 100);
                 }
             }
-        }
+        };
 
-        var read_co2 = function () {
+        let read_co2 = function () {
             obniz.uart0.send([0xff, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79]);
-        }
+        };
 
-        var high_alert = async function (n) {
-            for (var i = 0; i < n; i++) {
+        let high_alert = async function (n) {
+            for (let i = 0; i < n; i++) {
                 led.on();
                 await obniz.wait(300);
                 led.off();
                 await obniz.wait(300);
             }
-        }
+        };
 
         $('#read').click(read_co2);
         setInterval(read_co2, 20 * 1000); // update every 20sec
-    }
+    };
 
     obniz.onconnect = onconnect_func;
 
