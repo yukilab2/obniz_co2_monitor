@@ -27,8 +27,8 @@ TBD ###  at this point, browser required to run obniz.  Later server will run ob
 
 |MH-Z19 |Obniz|
 |---|---|
-| Vin (pin6) (3.6 - 5V) | 3 |
-| GND (pin7)            | 4 |
+| Vin (pin6) (3.6 - 5V) | 2 |
+| GND (pin7)            | 3 |
 | RxD (pin2) (0 / 3.3V) | 0 (TxD) |
 | TxD (pin3) (0 / 3.3V) | 1 (RxD) |
 
